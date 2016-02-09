@@ -3,7 +3,7 @@ Enables easy and automatic usage of Application Insights with your Windows Forms
 ## Setup
 1. Create a new Windows desktop application (Forms, Console, etc)
 2. Library to the project
-3. Add the `MS Application Inisghts SDK` to [nuget package](https://www.nuget.org/packages/Microsoft.ApplicationInsights/)  the project 
+3. Add the `MS Application Inisghts SDK` [nuget package](https://www.nuget.org/packages/Microsoft.ApplicationInsights/)  the project 
 3. Create a `TelemetryClient` object in your code with:
 ```
 var myClient = Telemetry.CreateClient("<name to give the client>", "<instrumentation key from App Insights project>");
