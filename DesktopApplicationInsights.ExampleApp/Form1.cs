@@ -12,7 +12,7 @@
             this.telemetryButton1.TelemetryClientName = "DesktopApplicationInsights.ExampleApp";
         }
 
-        private void telemetryButton1_Click(object sender, System.EventArgs e)
+        private void telemetryButton1_Click(object sender, EventArgs e)
         {
             try
             {

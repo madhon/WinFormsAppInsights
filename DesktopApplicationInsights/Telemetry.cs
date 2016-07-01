@@ -7,6 +7,7 @@
     using System.Reflection;
     using System.Windows.Forms;
     using Microsoft.ApplicationInsights;
+    using Microsoft.ApplicationInsights.Channel;
     using Microsoft.ApplicationInsights.DataContracts;
     using Microsoft.ApplicationInsights.Extensibility;
 
@@ -36,14 +37,14 @@
             if (_clientsAndConfigs.ContainsKey(clientName))
             {
                 throw new ArgumentException(
-                    string.Format("A client already exists with name \"{0}\". Use GetClient() to retrieve it.", clientName),
-                    "clientName");
+                    $"A client already exists with name \"{clientName}\". Use GetClient() to retrieve it.",
+                    nameof(clientName));
             }
 
             if (_clientsAndConfigs.Any(c => c.Value.Item1.InstrumentationKey.Equals(instrumentationKey, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ArgumentException(
-                    "A client already exists with the given instrumentation key.", "instrumentationKey");
+                    "A client already exists with the given instrumentation key.", nameof(instrumentationKey));
             }
 
             var config = TelemetryConfiguration.CreateDefault();
@@ -86,7 +87,7 @@
             Tuple<TelemetryClient, TelemetryConfiguration> clientWithConfig;
             if (!_clientsAndConfigs.TryGetValue(clientName, out clientWithConfig))
             {
-                throw new ArgumentException(string.Format("No client has been created with name \"{0}\"", clientName), "clientName");
+                throw new ArgumentException($"No client has been created with name \"{clientName}\"", nameof(clientName));
             }
 
             return clientWithConfig.Item1;
@@ -96,7 +97,7 @@
             TelemetryClient client, TelemetryConfiguration config, TelemetryInitializer initializer)
         {
             config.InstrumentationKey = instrumentationKey;
-            config.ContextInitializers.Add(initializer);
+            config.TelemetryInitializers.Add(initializer);
 
             Application.ThreadException += (s, e) =>
             {
@@ -145,22 +146,16 @@
         /// Disables the specified client.
         /// </summary>
         /// <param name="client">The client.</param>
-        public static void Disable(this TelemetryClient client)
-        {
-            _clientsAndConfigs.Single(c => c.Value.Item1 == client).Value.Item2.DisableTelemetry = true;
-        }
+        public static void Disable(this TelemetryClient client) => _clientsAndConfigs.Single(c => c.Value.Item1 == client).Value.Item2.DisableTelemetry = true;
 
         /// <summary>
         /// Enables the specified client.
         /// </summary>
         /// <param name="client">The client.</param>
-        public static void Enable(this TelemetryClient client)
-        {
-            _clientsAndConfigs.Single(c => c.Value.Item1 == client).Value.Item2.DisableTelemetry = false;
-        }
+        public static void Enable(this TelemetryClient client) => _clientsAndConfigs.Single(c => c.Value.Item1 == client).Value.Item2.DisableTelemetry = false;
     }
 
-    class TelemetryInitializer : IContextInitializer
+    class TelemetryInitializer : ITelemetryInitializer
     {
         private readonly Assembly _sourceAssembly;
 
@@ -169,27 +164,27 @@
             _sourceAssembly = sourceAssembly;
         }
 
-        public void Initialize(TelemetryContext context)
+        public void Initialize(ITelemetry telemetry)
         {
-            context.Component.Version = _sourceAssembly.GetName().Version.ToString();
+            telemetry.Context.Component.Version = _sourceAssembly.GetName().Version.ToString();
 
-            context.Device.Language = CultureInfo.CurrentUICulture.IetfLanguageTag;
-            context.Device.OperatingSystem = Environment.OSVersion.ToString();
+            telemetry.Context.Device.Language = CultureInfo.CurrentUICulture.IetfLanguageTag;
+            telemetry.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
 
             string screenResolutionData = GetScreenResolutionData();
-            context.Device.ScreenResolution = screenResolutionData;
+            telemetry.Context.Device.ScreenResolution = screenResolutionData;
 
-            context.Properties.Add("64BitOS", Environment.Is64BitOperatingSystem.ToString());
-            context.Properties.Add("64BitProcess", Environment.Is64BitProcess.ToString());
-            context.Properties.Add("Machine name", Environment.MachineName);
-            context.Properties.Add("ProcessorCount", Environment.ProcessorCount.ToString());
-            context.Properties.Add("ClrVersion", Environment.Version.ToString());
+            telemetry.Context.Properties.Add("64BitOS", Environment.Is64BitOperatingSystem.ToString());
+            telemetry.Context.Properties.Add("64BitProcess", Environment.Is64BitProcess.ToString());
+            telemetry.Context.Properties.Add("Machine name", Environment.MachineName);
+            telemetry.Context.Properties.Add("ProcessorCount", Environment.ProcessorCount.ToString());
+            telemetry.Context.Properties.Add("ClrVersion", Environment.Version.ToString());
 
-            context.Session.Id = DateTime.Now.ToFileTime().ToString();
-            context.Session.IsFirst = true;
+            telemetry.Context.Session.Id = DateTime.Now.ToFileTime().ToString();
+            telemetry.Context.Session.IsFirst = true;
 
-            context.User.AccountId = Environment.UserDomainName;
-            context.User.Id = Environment.UserName;
+            telemetry.Context.User.AccountId = Environment.UserDomainName;
+            telemetry.Context.User.Id = Environment.UserName;
         }
 
         private string GetScreenResolutionData()
@@ -200,13 +195,14 @@
                 for (int i = 0; i < Screen.AllScreens.Length; i++)
                 {
                     var screen = Screen.AllScreens[i];
-                    screenData.AppendLine(string.Format("[{0}] {1}x{2}", i, screen.Bounds.Width, screen.Bounds.Height));
+                    screenData.AppendLine(
+                        $"[{i.ToString()}] {screen.Bounds.Width.ToString()}x{screen.Bounds.Height.ToString()}");
                 }
                 return screenData.ToString();
             }
             else
             {
-                return string.Concat(Screen.PrimaryScreen.Bounds.Width, "x", Screen.PrimaryScreen.Bounds.Height);
+                return string.Concat(Screen.PrimaryScreen.Bounds.Width.ToString(), "x", Screen.PrimaryScreen.Bounds.Height.ToString());
             }
         }
     }

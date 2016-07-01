@@ -19,7 +19,7 @@
             _telemetryClientFetcher = new Lazy<TelemetryClient>(() =>
             {
                 System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(this.TelemetryClientName),
-                    string.Format("No Telemetry client name set on Telemetry Button \"{0}\"", this.Name));
+                    $"No Telemetry client name set on Telemetry Button \"{this.Name}\"");
 
                 if (!string.IsNullOrWhiteSpace(this.TelemetryClientName))
                 {
@@ -29,8 +29,8 @@
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.Fail(string.Format("Couldn't find telemetry client with name {0}",
-                            this.TelemetryClientName), ex.ToString());
+                        System.Diagnostics.Debug.Fail(
+                            $"Couldn't find telemetry client with name {this.TelemetryClientName}", ex.ToString());
                     }
                 }
 
@@ -47,10 +47,7 @@
         /// <summary>
         /// Gets the telemetry client.
         /// </summary>
-        protected TelemetryClient TelemetryClient
-        {
-            get { return _telemetryClientFetcher.Value; }
-        }
+        protected TelemetryClient TelemetryClient => _telemetryClientFetcher.Value;
 
         /// <summary>
         /// Gets or sets the Event Name to use when logging the Button's execution
@@ -78,8 +75,7 @@
 
                 if (!string.IsNullOrWhiteSpace(this.EventName))
                 {
-                    var telemetryData = new EventTelemetry(this.EventName);
-                    telemetryData.Timestamp = startTime;
+                    var telemetryData = new EventTelemetry(this.EventName) { Timestamp = startTime };
                     if (this.IsTimed)
                     {
                         telemetryData.Metrics.Add(string.Concat(this.EventName, "_Duration"),

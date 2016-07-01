@@ -29,7 +29,7 @@
             _telemetryClientFetcher = new Lazy<TelemetryClient>(() =>
             {
                 System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(this.TelemetryClientName),
-                    string.Format("No Telemetry client name set on Telemetry Button \"{0}\"", this.Name));
+                    $"No Telemetry client name set on Telemetry Button \"{this.Name}\"");
 
                 if (!string.IsNullOrWhiteSpace(this.TelemetryClientName))
                 {
@@ -39,8 +39,8 @@
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.Fail(string.Format("Couldn't find telemetry client with name {0}",
-                            this.TelemetryClientName), ex.ToString());
+                        System.Diagnostics.Debug.Fail(
+                            $"Couldn't find telemetry client with name {this.TelemetryClientName}", ex.ToString());
                     }
                 }
 
@@ -57,10 +57,7 @@
         /// <summary>
         /// Gets the telemetry client.
         /// </summary>
-        protected TelemetryClient TelemetryClient
-        {
-            get { return _telemetryClientFetcher.Value; }
-        }
+        protected TelemetryClient TelemetryClient => _telemetryClientFetcher.Value;
 
         /// <summary>
         /// Raises the <see cref="E:Load" /> event.
