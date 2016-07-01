@@ -159,32 +159,58 @@
     {
         private readonly Assembly _sourceAssembly;
 
+        private readonly string assemblyVersion;
+        private readonly string languageTag;
+        private readonly string operatingSystem;
+        private readonly string screenResolutionData;
+        private readonly string is64bitOS;
+        private readonly string is64bitProcess;
+        private readonly string machineName;
+        private readonly string processorCount;
+        private readonly string clrVersion;
+        private readonly string sessionId;
+        private readonly bool sessionIsFirst;
+        private readonly string accountId;
+        private readonly string userId;
+
         public TelemetryInitializer(Assembly sourceAssembly)
         {
             _sourceAssembly = sourceAssembly;
+            assemblyVersion = _sourceAssembly.GetName().Version.ToString();
+            languageTag = CultureInfo.CurrentUICulture.IetfLanguageTag;
+            operatingSystem = Environment.OSVersion.ToString();
+            screenResolutionData = GetScreenResolutionData();
+            is64bitOS = Environment.Is64BitOperatingSystem.ToString();
+            is64bitProcess = Environment.Is64BitProcess.ToString();
+            machineName = Environment.MachineName;
+            processorCount = Environment.ProcessorCount.ToString();
+            clrVersion = Environment.Version.ToString();
+            sessionId = DateTime.Now.ToFileTime().ToString();
+            sessionIsFirst = true;
+            accountId = Environment.UserDomainName;
+            userId = Environment.UserName;
         }
 
         public void Initialize(ITelemetry telemetry)
         {
-            telemetry.Context.Component.Version = _sourceAssembly.GetName().Version.ToString();
+            telemetry.Context.Component.Version = assemblyVersion;
 
-            telemetry.Context.Device.Language = CultureInfo.CurrentUICulture.IetfLanguageTag;
-            telemetry.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
+            telemetry.Context.Device.Language = languageTag;
+            telemetry.Context.Device.OperatingSystem = operatingSystem;
 
-            string screenResolutionData = GetScreenResolutionData();
             telemetry.Context.Device.ScreenResolution = screenResolutionData;
 
-            telemetry.Context.Properties.Add("64BitOS", Environment.Is64BitOperatingSystem.ToString());
-            telemetry.Context.Properties.Add("64BitProcess", Environment.Is64BitProcess.ToString());
-            telemetry.Context.Properties.Add("Machine name", Environment.MachineName);
-            telemetry.Context.Properties.Add("ProcessorCount", Environment.ProcessorCount.ToString());
-            telemetry.Context.Properties.Add("ClrVersion", Environment.Version.ToString());
+            telemetry.Context.Properties.Add("64BitOS", is64bitOS);
+            telemetry.Context.Properties.Add("64BitProcess", is64bitProcess);
+            telemetry.Context.Properties.Add("Machine name", machineName);
+            telemetry.Context.Properties.Add("ProcessorCount", processorCount);
+            telemetry.Context.Properties.Add("ClrVersion", clrVersion);
 
-            telemetry.Context.Session.Id = DateTime.Now.ToFileTime().ToString();
-            telemetry.Context.Session.IsFirst = true;
+            telemetry.Context.Session.Id = sessionId;
+            telemetry.Context.Session.IsFirst = sessionIsFirst;
 
-            telemetry.Context.User.AccountId = Environment.UserDomainName;
-            telemetry.Context.User.Id = Environment.UserName;
+            telemetry.Context.User.AccountId = accountId;
+            telemetry.Context.User.Id = userId;
         }
 
         private string GetScreenResolutionData()
