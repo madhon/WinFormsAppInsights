@@ -14,7 +14,7 @@
     /// <summary>Root class providing easy access to <c>TelemetryClient</c> and global Telemetry Configuration</summary>
     public static class Telemetry
     {
-        private static Dictionary<string, Tuple<TelemetryClient, TelemetryConfiguration>> _clientsAndConfigs = new Dictionary<string, Tuple<TelemetryClient, TelemetryConfiguration>>();
+        private static readonly Dictionary<string, Tuple<TelemetryClient, TelemetryConfiguration>> _clientsAndConfigs = new Dictionary<string, Tuple<TelemetryClient, TelemetryConfiguration>>();
         /// <summary>
         /// Creates the client.
         /// </summary>
