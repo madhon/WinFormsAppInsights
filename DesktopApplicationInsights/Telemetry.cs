@@ -103,7 +103,6 @@
             {
                 client.TrackException(new ExceptionTelemetry(e.Exception)
                 {
-                    HandledAt = ExceptionHandledAt.Unhandled,
                     SeverityLevel = SeverityLevel.Critical,
                 });
 
@@ -129,7 +128,6 @@
         {
             var o = new ExceptionTelemetry(ex)
             {
-                HandledAt = ExceptionHandledAt.UserCode,
                 SeverityLevel = severityLevel
             };
 
@@ -194,21 +192,16 @@
         public void Initialize(ITelemetry telemetry)
         {
             telemetry.Context.Component.Version = assemblyVersion;
-
-            telemetry.Context.Device.Language = languageTag;
+            telemetry.Context.Properties.Add("Language", languageTag);
             telemetry.Context.Device.OperatingSystem = operatingSystem;
-
-            telemetry.Context.Device.ScreenResolution = screenResolutionData;
-
+            telemetry.Context.Properties.Add("ScreenResolution", screenResolutionData);
             telemetry.Context.Properties.Add("64BitOS", is64bitOS);
             telemetry.Context.Properties.Add("64BitProcess", is64bitProcess);
             telemetry.Context.Properties.Add("Machine name", machineName);
             telemetry.Context.Properties.Add("ProcessorCount", processorCount);
             telemetry.Context.Properties.Add("ClrVersion", clrVersion);
-
             telemetry.Context.Session.Id = sessionId;
             telemetry.Context.Session.IsFirst = sessionIsFirst;
-
             telemetry.Context.User.AccountId = accountId;
             telemetry.Context.User.Id = userId;
         }
