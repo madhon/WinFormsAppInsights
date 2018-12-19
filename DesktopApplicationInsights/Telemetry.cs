@@ -192,14 +192,14 @@
         public void Initialize(ITelemetry telemetry)
         {
             telemetry.Context.Component.Version = assemblyVersion;
-            telemetry.Context.Properties.Add("Language", languageTag);
+            telemetry.Context.GlobalProperties.Add("Language", languageTag);
             telemetry.Context.Device.OperatingSystem = operatingSystem;
-            telemetry.Context.Properties.Add("ScreenResolution", screenResolutionData);
-            telemetry.Context.Properties.Add("64BitOS", is64bitOS);
-            telemetry.Context.Properties.Add("64BitProcess", is64bitProcess);
-            telemetry.Context.Properties.Add("Machine name", machineName);
-            telemetry.Context.Properties.Add("ProcessorCount", processorCount);
-            telemetry.Context.Properties.Add("ClrVersion", clrVersion);
+            telemetry.Context.GlobalProperties.Add("ScreenResolution", screenResolutionData);
+            telemetry.Context.GlobalProperties.Add("64BitOS", is64bitOS);
+            telemetry.Context.GlobalProperties.Add("64BitProcess", is64bitProcess);
+            telemetry.Context.GlobalProperties.Add("Machine name", machineName);
+            telemetry.Context.GlobalProperties.Add("ProcessorCount", processorCount);
+            telemetry.Context.GlobalProperties.Add("ClrVersion", clrVersion);
             telemetry.Context.Session.Id = sessionId;
             telemetry.Context.Session.IsFirst = sessionIsFirst;
             telemetry.Context.User.AccountId = accountId;
